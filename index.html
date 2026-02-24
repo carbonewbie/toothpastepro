@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>定制牙膏小程序 - 交互演示</title>
+  <style>
+/* 定制牙膏小程序演示 - 样式文件 */
+
+:root {
+  /* 配色方案 */
+  --primary-color: #4A90E2;
+  --secondary-color: #5AC8AF;
+  --accent-color: #E63946;
+  --price-color: #FF9800;
+  --bg-light: #F8F9FA;
+  --bg-warm: #F9F3ED;
+  --text-dark: #333333;
+  --text-medium: #666666;
+  --text-light: #999999;
+  --border-color: #E0E0E0;
+
+  /* 尺寸 */
+  --safe-padding: 20px;
+  --card-radius: 16px;
+  --btn-height: 60px;
+  --btn-radius: 30px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 页面容器 */
+.page {
+  display: none;
+  min-height: 100vh;
+  padding-bottom: 100px;
+}
+
+.page.active {
+  display: block;
+}
+
+/* 首页背景 */
+.page-home {
+  background-color: var(--bg-warm);
+}
+
+/* 导航栏 */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  padding: 15px var(--safe-padding);
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.back-btn {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {
+  background: var(--bg-light);
+}
+
+.back-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-dark);
+}
+
+.step-indicator {
+  margin-left: auto;
+  font-size: 14px;
+  color: var(--text-medium);
+}
+
+/* 标题区 */
+.title-section {
+  text-align: center;
+  padding: 30px var(--safe-padding);
+}
+
+.main-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-medium);
+  line-height: 1.6;
+}
+
+/* 介绍区 */
+.intro-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px var(--safe-padding);
+  margin: 0 var(--safe-padding);
+  border-radius: var(--card-radius);
+}
+
+.intro-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.intro-text {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.8;
+}
+
+/* 选项列表 */
+.options-section {
+  padding: 20px var(--safe-padding);
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+/* 规格卡片 */
+.spec-card {
+  background: white;
+  border-radius: var(--card-radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.spec-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.spec-card.selected {
+  border-color: var(--secondary-color);
+  box-shadow: 0 8px 24px rgba(90, 200, 175, 0.2);
+}
+
+.spec-image {
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+}
+
+.spec-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.spec-desc {
+  font-size: 12px;
+  color: var(--text-light);
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.spec-capacity {
+  font-size: 14px;
+  color: var(--text-medium);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.spec-tag {
+  display: inline-block;
+  background: var(--secondary-color);
+  color: white;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.spec-price {
+  font-size: 18px;
+  color: var(--price-color);
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* 成分卡片 */
+.ingredient-card {
+  background: white;
+  border-radius: var(--card-radius);
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+  display: flex;
+  gap: 15px;
+  position: relative;
+}
+
+/* 多选模式的复选框指示器 */
+.checkbox-indicator {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.multi-select.selected .checkbox-indicator {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.multi-select.selected .checkbox-indicator::after {
+  content: '✓';
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ingredient-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.ingredient-card.selected {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.2);
+}
+
+.ingredient-image {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.ingredient-content {
+  flex: 1;
+}
+
+.ingredient-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ingredient-price {
+  color: var(--price-color);
+  font-weight: bold;
+}
+
+.ingredient-desc {
+  font-size: 13px;
+  color: var(--text-medium);
+  margin-bottom: 8px;
+}
+
+.ingredient-pros {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.ingredient-cons {
+  font-size: 12px;
+  color: var(--accent-color);
+  margin-top: 4px;
+}
+
+/* 底部按钮区 */
+.footer-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 20px var(--safe-padding);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+  z-index: 100;
+}
+
+.action-btn {
+  width: 100%;
+  height: var(--btn-height);
+  border-radius: var(--btn-radius);
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: var(--primary-color);
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.4);
+}
+
+.action-btn:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.action-btn.primary {
+  background: var(--primary-color);
+}
+
+.action-btn.success {
+  background: var(--secondary-color);
+}
+
+.action-btn.danger {
+  background: var(--accent-color);
+  box-shadow: 0 8px 24px rgba(230, 57, 70, 0.4);
+}
+
+/* 总结页 */
+.summary-container {
+  padding: 20px var(--safe-padding);
+}
+
+.toothpaste-showcase {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: var(--card-radius);
+  padding: 40px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.toothpaste-tube {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.summary-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.summary-subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+}
+
+.summary-table {
+  background: white;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.summary-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-tab {
+  flex: 1;
+  padding: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-medium);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.summary-tab.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  font-weight: bold;
+}
+
+.summary-row {
+  display: flex;
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-medium);
+}
+
+.summary-value {
+  flex: 2;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.summary-price {
+  flex: 1;
+  text-align: right;
+  color: var(--price-color);
+  font-weight: bold;
+}
+
+.total-section {
+  background: white;
+  border-radius: var(--card-radius);
+  padding: 25px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.total-label {
+  font-size: 16px;
+  color: var(--text-medium);
+  margin-bottom: 10px;
+}
+
+.total-price {
+  font-size: 48px;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.celebration-text {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 15px;
+  line-height: 1.8;
+}
+
+/* 下单页 */
+.order-form {
+  padding: 20px var(--safe-padding);
+}
+
+.form-group {
+  background: white;
+  border-radius: var(--card-radius);
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-size: 14px;
+  color: var(--text-medium);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.address-display {
+  padding: 15px;
+  background: var(--bg-light);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.address-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.address-phone {
+  color: var(--text-medium);
+  font-size: 14px;
+}
+
+.address-detail {
+  color: var(--text-medium);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+  :root {
+    --safe-padding: 15px;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-title {
+    font-size: 24px;
+  }
+
+  .total-price {
+    font-size: 40px;
+  }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
+
+</style>
+</head>
+<body>
+
+  <!-- 首页 - 规格选择 -->
+  <div id="home" class="page page-home active">
+    <nav class="nav-bar">
+      <div class="back-btn" onclick="window.history.back()">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
+    </nav>
+
+    <div class="intro-section">
+      <h1 class="intro-title">专属配方</h1>
+      <p class="intro-text">定制你的专属牙膏<br>每一天的护理都独一无二</p>
+    </div>
+
+    <div class="title-section">
+      <h2 class="main-title">选择规格</h2>
+      <p class="subtitle">容量规格决定各类成分的用量</p>
+    </div>
+
+    <div class="options-section">
+      <div id="specOptions" class="options-grid">
+        <!-- 规格选项将由JS动态生成 -->
+      </div>
+    </div>
+
+    <div class="footer-action">
+      <button id="homeNextBtn" class="action-btn success" onclick="goToNext()" disabled>选好了，下一步</button>
+    </div>
+  </div>
+
+  <!-- 成分选择页（通用模板） -->
+  <div id="ingredient" class="page">
+    <nav class="nav-bar">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
+      <span id="stepIndicator" class="step-indicator">1/6 基底磨合剂</span>
+    </nav>
+
+    <div class="title-section">
+      <h2 id="categoryTitle" class="main-title">选择基底磨合剂</h2>
+      <p id="categoryDesc" class="subtitle">选择基底成分，决定牙膏的摩擦特性和清洁力度（单选）</p>
+    </div>
+
+    <div class="options-section">
+      <div id="ingredientOptions">
+        <!-- 成分选项将由JS动态生成 -->
+      </div>
+    </div>
+
+    <div class="footer-action">
+      <button id="ingredientNextBtn" class="action-btn primary" onclick="goToNext()" disabled>下一步</button>
+    </div>
+  </div>
+
+  <!-- 总结页 -->
+  <div id="summary" class="page">
+    <nav class="nav-bar">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
+    </nav>
+
+    <div class="summary-container">
+      <div class="toothpaste-showcase">
+        <div class="toothpaste-tube">🦷</div>
+        <h2 class="summary-title">您的专属配方</h2>
+        <p class="summary-subtitle">已根据您的需求定制完成</p>
+      </div>
+
+      <div class="summary-table">
+        <div class="summary-tabs">
+          <div class="summary-tab active">配方总结</div>
+          <div class="summary-tab">规格</div>
+          <div class="summary-tab">加价</div>
+        </div>
+        <div id="summaryBody">
+          <!-- 配方信息将由JS动态生成 -->
+        </div>
+      </div>
+
+      <div class="total-section">
+        <div class="total-label">总价</div>
+        <div id="totalPrice" class="total-price">¥0</div>
+        <p class="celebration-text">这是专为你定制的牙膏<br>每一天的护理都独一无二</p>
+      </div>
+    </div>
+
+    <div class="footer-action">
+      <button id="summaryNextBtn" class="action-btn danger" onclick="goToNext()">立即下单</button>
+    </div>
+  </div>
+
+  <!-- 下单页 -->
+  <div id="order" class="page">
+    <nav class="nav-bar">
+      <div class="back-btn" onclick="goBack()">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </div>
+      <span class="step-indicator">确认订单</span>
+    </nav>
+
+    <div class="title-section">
+      <h2 class="main-title">确认订单信息</h2>
+    </div>
+
+    <div class="order-form">
+      <div class="form-group">
+        <label class="form-label">收货人姓名</label>
+        <input type="text" id="recipientName" class="form-input" placeholder="请输入收货人姓名">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">手机号码</label>
+        <input type="tel" id="recipientPhone" class="form-input" placeholder="请输入手机号码">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">收货地址</label>
+        <textarea id="recipientAddress" class="form-input" rows="3" placeholder="请输入详细收货地址"></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="address-display">
+          <div class="address-name">收货人：张三</div>
+          <div class="address-phone">138****8888</div>
+          <div class="address-detail">北京市朝阳区xxx街道xxx号</div>
+        </div>
+        <label class="form-label" style="margin-top: 10px;">使用默认地址</label>
+      </div>
+
+      <div class="summary-table">
+        <div class="summary-tabs">
+          <div class="summary-tab active">订单详情</div>
+        </div>
+        <div id="orderSummary">
+          <!-- 订单信息将由JS动态生成 -->
+        </div>
+      </div>
+
+      <div class="total-section">
+        <div class="total-label">支付金额</div>
+        <div id="orderTotalPrice" class="total-price">¥0</div>
+      </div>
+    </div>
+
+    <div class="footer-action">
+      <button class="action-btn danger" onclick="submitOrder()">确认支付</button>
+    </div>
+  </div>
+
+  <script>
+/* 定制牙膏小程序演示 - 交互逻辑和数据 */
+
+// 规格数据
+const specData = [
+  {
+    id: 's1',
+    name: '小样装',
+    capacity: '15ml',
+    price: 2,
+    tag: '首次体验',
+    description: '适合初次体验'
+  },
+  {
+    id: 's2',
+    name: '标准装',
+    capacity: '60ml',
+    price: 2,
+    tag: '推荐',
+    description: '适合日常使用'
+  },
+  {
+    id: 's3',
+    name: '家庭装',
+    capacity: '120ml',
+    price: 1,
+    tag: '',
+    description: '适合全家使用'
+  },
+  {
+    id: 's4',
+    name: '超大装',
+    capacity: '180ml',
+    price: 0,
+    tag: '',
+    description: '性价比之选'
+  }
+];
+
+// 成分类别数据
+const categoryData = {
+  base: {
+    title: '基底磨合剂',
+    description: '选择基底成分，决定牙膏的摩擦特性和清洁力度',
+    options: [
+      {
+        id: 'b1',
+        name: '水合硅石',
+        desc: '磨合更柔和、不易损伤牙釉质',
+        price: 5,
+        amount: '55ml',
+        pros: '温和护齿，适合敏感人群',
+        cons: '清洁力稍弱',
+        icon: '🦷'
+      },
+      {
+        id: 'b2',
+        name: '水合硅石+碳酸钙',
+        desc: '磨合力更强，清洁更彻底',
+        price: 4,
+        amount: '40ml+15ml',
+        pros: '清洁力强，去渍效果好',
+        cons: '可能损伤牙齿',
+        icon: '💎'
+      },
+      {
+        id: 'b3',
+        name: '磷酸氢钙',
+        desc: '温和无刺激，适合敏感牙人群',
+        price: 6,
+        amount: '55ml',
+        pros: '极其温和，无刺激',
+        cons: '价格较高',
+        icon: '✨'
+      },
+      {
+        id: 'b4',
+        name: '氢氧化铝',
+        desc: '兼具抛光效果，减少牙面色素沉积',
+        price: 7,
+        amount: '55ml',
+        pros: '抛光效果好，防色素沉积',
+        cons: '成本较高',
+        icon: '🌟'
+      }
+    ]
+  },
+  clean: {
+    title: '清洁杀菌效果',
+    description: '选择清洁杀菌成分，决定牙膏的抗菌和清新效果',
+    options: [
+      {
+        id: 'c1',
+        name: '月桂酰肌氨酸钠',
+        desc: '温和发泡，清洁力强且不刺激口腔黏膜',
+        price: 8,
+        amount: '1.5%',
+        pros: '温和不刺激，清洁力强',
+        cons: '价格较高',
+        icon: '🫧'
+      },
+      {
+        id: 'c2',
+        name: '月桂醇硫酸酯钠',
+        desc: '起泡丰富，清洁力强',
+        price: 5,
+        amount: '2%',
+        pros: '起泡丰富，性价比高',
+        cons: '可能刺激口腔黏膜',
+        icon: '🧴'
+      },
+      {
+        id: 'c3',
+        name: '椰油酰胺丙基甜菜碱',
+        desc: '两性表面活性剂，温和无刺激',
+        price: 10,
+        amount: '2%',
+        pros: '极度温和，敏感口腔适用',
+        cons: '成本最高',
+        icon: '🌿'
+      },
+      {
+        id: 'c4',
+        name: '不添加',
+        desc: '仅依靠物理摩擦清洁，无化学乳化',
+        price: 0,
+        amount: '-',
+        pros: '无化学成分，天然安全',
+        cons: '清洁力较弱',
+        icon: '💧'
+      }
+    ]
+  },
+  antiCavity: {
+    title: '防龋齿效果',
+    description: '选择防龋齿成分，决定牙膏的防蛀能力',
+    options: [
+      {
+        id: 'a1',
+        name: '氟化钠',
+        desc: '预防龋齿的黄金成分，促进牙釉质再矿化',
+        price: 6,
+        amount: '0.24%',
+        pros: '临床验证充分，防蛀效果好',
+        cons: '儿童需控制用量',
+        icon: '🦠'
+      },
+      {
+        id: 'a2',
+        name: '单氟磷酸钠',
+        desc: '高效防蛀成分，稳定性好',
+        price: 7,
+        amount: '0.76%',
+        pros: '防蛀效果好，副作用小',
+        cons: '成本较高',
+        icon: '⚡'
+      },
+      {
+        id: 'a3',
+        name: '木糖醇',
+        desc: '天然防蛀成分，抑制致龋菌',
+        price: 8,
+        amount: '5%',
+        pros: '天然安全，儿童可用',
+        cons: '防蛀效果略逊于氟化物',
+        icon: '🍃'
+      },
+      {
+        id: 'a4',
+        name: '不添加',
+        desc: '无防蛀成分，仅依靠物理清洁',
+        price: 0,
+        amount: '-',
+        pros: '无化学成分',
+        cons: '防蛀能力有限',
+        icon: '🚫'
+      }
+    ]
+  },
+  whitening: {
+    title: '美白效果',
+    description: '选择美白成分，决定牙膏的美白能力',
+    options: [
+      {
+        id: 'w1',
+        name: '植酸钠',
+        desc: '通过螯合作用去除色素，温和美白',
+        price: 12,
+        amount: '0.5%',
+        pros: '温和不伤牙釉质',
+        cons: '见效慢，需持续使用',
+        icon: '🌈'
+      },
+      {
+        id: 'w2',
+        name: '过氧化氢',
+        desc: '通过氧化作用分解色素，快速美白',
+        price: 15,
+        amount: '1%',
+        pros: '见效快',
+        cons: '可能损伤牙釉质，敏感牙慎用',
+        icon: '⚡'
+      },
+      {
+        id: 'w3',
+        name: '珍珠粉',
+        desc: '天然美白成分，温和去渍',
+        price: 10,
+        amount: '2%',
+        pros: '天然成分，温和安全',
+        cons: '美白效果较慢',
+        icon: '✨'
+      },
+      {
+        id: 'w4',
+        name: '不添加',
+        desc: '无美白成分',
+        price: 0,
+        amount: '-',
+        pros: '无化学成分',
+        cons: '无美白效果',
+        icon: '🚫'
+      }
+    ]
+  },
+  gumCare: {
+    title: '牙龈护理效果',
+    description: '选择牙龈护理成分，改善牙龈健康',
+    options: [
+      {
+        id: 'g1',
+        name: '维生素E',
+        desc: '滋养牙龈，促进牙龈健康',
+        price: 6,
+        amount: '0.5%',
+        pros: '滋养牙龈，改善红肿',
+        cons: '见效较慢',
+        icon: '💚'
+      },
+      {
+        id: 'g2',
+        name: '草本精华',
+        desc: '多种草本萃取，舒缓牙龈不适',
+        price: 8,
+        amount: '1%',
+        pros: '舒缓效果明显，天然草本',
+        cons: '可能对草本成分过敏',
+        icon: '🌿'
+      },
+      {
+        id: 'g3',
+        name: '益生菌',
+        desc: '平衡口腔菌群，改善牙龈炎症',
+        price: 10,
+        amount: '0.1%',
+        pros: '从根源改善口腔环境',
+        cons: '成本较高',
+        icon: '🦠'
+      },
+      {
+        id: 'g4',
+        name: '不添加',
+        desc: '无特殊牙龈护理成分',
+        price: 0,
+        amount: '-',
+        pros: '无额外成分',
+        cons: '无牙龈护理效果',
+        icon: '🚫'
+      }
+    ]
+  },
+  flavor: {
+    title: '口味选择',
+    description: '选择牙膏口味，享受刷牙体验',
+    options: [
+      {
+        id: 'f1',
+        name: '薄荷味',
+        desc: '经典清新口味，持久留香',
+        price: 0,
+        amount: '适量',
+        pros: '经典口味，接受度高',
+        cons: '口味单一',
+        icon: '🍃'
+      },
+      {
+        id: 'f2',
+        name: '水果味',
+        desc: '香甜水果味，适合儿童',
+        price: 0,
+        amount: '适量',
+        pros: '口感香甜，儿童喜欢',
+        cons: '不适合重度吸烟人群',
+        icon: '🍓'
+      },
+      {
+        id: 'f3',
+        name: '茶香型',
+        desc: '清香茶味，舒缓放松',
+        price: 2,
+        amount: '适量',
+        pros: '清香宜人，口感独特',
+        cons: '口味小众',
+        icon: '🍵'
+      },
+      {
+        id: 'f4',
+        name: '无味',
+        desc: '无额外香精添加',
+        price: 0,
+        amount: '-',
+        pros: '无香精，适合敏感人群',
+        cons: '口感较淡',
+        icon: '🚫'
+      }
+    ]
+  }
+};
+
+// 全局状态
+let currentStep = 'home';
+let currentCategory = '';
+let selectedSpec = null;
+let selections = {
+  base: null,
+  clean: [],
+  antiCavity: [],
+  whitening: [],
+  gumCare: [],
+  flavor: []
+};
+
+const categoryOrder = ['base', 'clean', 'antiCavity', 'whitening', 'gumCare', 'flavor'];
+
+// 页面切换
+function showPage(pageId, category = '') {
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+  const targetPage = document.getElementById(pageId);
+  if (targetPage) {
+    targetPage.classList.add('active');
+    targetPage.classList.add('fade-in');
+    setTimeout(() => {
+      targetPage.classList.remove('fade-in');
+    }, 300);
+  }
+  currentStep = pageId;
+  currentCategory = category;
+  window.scrollTo(0, 0);
+}
+
+// 选择规格
+function selectSpec(specId) {
+  selectedSpec = specData.find(s => s.id === specId);
+  document.querySelectorAll('.spec-card').forEach(card => {
+    card.classList.remove('selected');
+    if (card.dataset.id === specId) {
+      card.classList.add('selected');
+    }
+  });
+  updateNextButton();
+}
+
+// 选择成分（支持多选）
+function selectIngredient(category, optionId) {
+  const option = categoryData[category].options.find(o => o.id === optionId);
+  
+  if (Array.isArray(selections[category])) {
+    // 多选模式：切换选中/取消状态
+    const index = selections[category].findIndex(o => o.id === optionId);
+    if (index >= 0) {
+      selections[category].splice(index, 1);
+    } else {
+      selections[category].push(option);
+    }
+  } else {
+    // 单选模式（如基底）
+    selections[category] = option;
+  }
+  
+  // 更新UI显示
+  document.querySelectorAll(`.ingredient-card[data-category="${category}"]`).forEach(card => {
+    const cardOptionId = card.dataset.id;
+    const isSelected = Array.isArray(selections[category]) 
+      ? selections[category].some(o => o.id === cardOptionId)
+      : selections[category] && selections[category].id === cardOptionId;
+    
+    if (isSelected) {
+      card.classList.add('selected');
+    } else {
+      card.classList.remove('selected');
+    }
+  });
+  
+  updateNextButton();
+}
+
+// 更新下一步按钮状态
+function updateNextButton() {
+  let btnId = '';
+  let canProceed = false;
+
+  if (currentStep === 'home') {
+    btnId = 'homeNextBtn';
+    canProceed = selectedSpec !== null;
+  } else if (currentStep === 'ingredient') {
+    btnId = 'ingredientNextBtn';
+    const selection = selections[currentCategory];
+    if (Array.isArray(selection)) {
+      // 多选模式：至少选择一个才能继续
+      canProceed = selection.length > 0;
+    } else {
+      // 单选模式：必须选择一个
+      canProceed = selection !== null;
+    }
+  }
+
+  if (btnId) {
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      btn.disabled = !canProceed;
+    }
+  }
+}
+
+// 计算总价
+function calculateTotal() {
+  let total = selectedSpec ? selectedSpec.price : 0;
+  categoryOrder.forEach(category => {
+    const selection = selections[category];
+    if (Array.isArray(selection)) {
+      // 多选模式：累加所有选中项的价格
+      selection.forEach(item => {
+        total += item.price;
+      });
+    } else if (selection) {
+      // 单选模式：只加一项
+      total += selection.price;
+    }
+  });
+  return total;
+}
+
+// 进入下一步
+function goToNext() {
+  const currentIndex = categoryOrder.indexOf(currentCategory);
+
+  if (currentStep === 'home') {
+    showPage('ingredient', 'base');
+  } else if (currentStep === 'ingredient' && currentIndex >= 0 && currentIndex < categoryOrder.length - 1) {
+    showPage('ingredient', categoryOrder[currentIndex + 1]);
+  } else if (currentStep === 'ingredient' && currentIndex === categoryOrder.length - 1) {
+    updateSummary();
+    showPage('summary');
+  } else if (currentStep === 'summary') {
+    showPage('order');
+  }
+}
+
+// 返回上一步
+function goBack() {
+  if (currentStep === 'home') {
+    return;
+  }
+
+  const currentIndex = categoryOrder.indexOf(currentCategory);
+
+  if (currentStep === 'ingredient' && currentIndex > 0) {
+    showPage('ingredient', categoryOrder[currentIndex - 1]);
+  } else if (currentStep === 'ingredient' && currentIndex === 0) {
+    showPage('home');
+  } else if (currentStep === 'summary') {
+    showPage('ingredient', 'flavor');
+  } else if (currentStep === 'order') {
+    showPage('summary');
+  }
+}
+
+// 更新总结页
+function updateSummary() {
+  const summaryBody = document.getElementById('summaryBody');
+  if (!summaryBody) return;
+
+  let html = '';
+
+  // 规格信息
+  if (selectedSpec) {
+    html += `
+      <div class="summary-row">
+        <span class="summary-label">规格</span>
+        <span class="summary-value">${selectedSpec.name} (${selectedSpec.capacity})</span>
+        <span class="summary-price">¥${selectedSpec.price}</span>
+      </div>
+    `;
+  }
+
+  // 成分信息
+  categoryOrder.forEach(category => {
+    const selection = selections[category];
+    if (selection) {
+      if (Array.isArray(selection)) {
+        // 多选模式：显示所有选中项
+        if (selection.length > 0) {
+          html += `
+            <div class="summary-row">
+              <span class="summary-label">${categoryData[category].title}</span>
+              <span class="summary-value">
+                ${selection.map(item => item.name + (item.amount ? ` (${item.amount})` : '')).join(' + ')}
+              </span>
+              <span class="summary-price">+¥${selection.reduce((sum, item) => sum + item.price, 0)}</span>
+            </div>
+          `;
+        }
+      } else {
+        // 单选模式
+        html += `
+          <div class="summary-row">
+            <span class="summary-label">${categoryData[category].title}</span>
+            <span class="summary-value">${selection.name} ${selection.amount ? `(${selection.amount})` : ''}</span>
+            <span class="summary-price">${selection.price > 0 ? `+¥${selection.price}` : '-'}</span>
+          </div>
+        `;
+      }
+    }
+  });
+
+  summaryBody.innerHTML = html;
+
+  // 更新总价
+  const totalPrice = calculateTotal();
+  document.getElementById('totalPrice').textContent = `¥${totalPrice}`;
+}
+
+// 提交订单
+function submitOrder() {
+  const name = document.getElementById('recipientName').value;
+  const phone = document.getElementById('recipientPhone').value;
+  const address = document.getElementById('recipientAddress').value;
+
+  if (!name || !phone || !address) {
+    alert('请填写完整的收货信息');
+    return;
+  }
+
+  alert('订单提交成功！感谢您的购买！');
+  // 这里可以添加实际的订单提交逻辑
+}
+
+// 渲染规格选择页
+function renderSpecPage() {
+  const container = document.getElementById('specOptions');
+  if (!container) return;
+
+  let html = '';
+  specData.forEach(spec => {
+    html += `
+      <div class="spec-card" data-id="${spec.id}" onclick="selectSpec('${spec.id}')">
+        ${spec.tag ? `<span class="spec-tag">${spec.tag}</span>` : ''}
+        <div class="spec-image">${spec.id === 's1' ? '🧴' : spec.id === 's2' ? '🧴' : spec.id === 's3' ? '🧴' : '🧴'}</div>
+        <div class="spec-name">${spec.name}</div>
+        <div class="spec-capacity">${spec.capacity}</div>
+        <div class="spec-desc">${spec.description}</div>
+        <div class="spec-price">¥${spec.price}</div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+// 渲染成分选择页
+function renderIngredientPage(category) {
+  const container = document.getElementById('ingredientOptions');
+  const titleEl = document.getElementById('categoryTitle');
+  const descEl = document.getElementById('categoryDesc');
+  const indicatorEl = document.getElementById('stepIndicator');
+
+  if (!container || !categoryData[category]) return;
+
+  const data = categoryData[category];
+  const stepIndex = categoryOrder.indexOf(category) + 1;
+  
+  // 判断是否为多选模式
+  const isMultiSelect = Array.isArray(selections[category]);
+
+  titleEl.textContent = data.title;
+  descEl.textContent = data.description + (isMultiSelect ? '（可多选）' : '（单选）');
+  indicatorEl.textContent = `${stepIndex}/6 ${data.title}`;
+
+  let html = '';
+  data.options.forEach(option => {
+    html += `
+      <div class="ingredient-card ${isMultiSelect ? 'multi-select' : ''}" data-category="${category}" data-id="${option.id}" onclick="selectIngredient('${category}', '${option.id}')">
+        ${isMultiSelect ? '<div class="checkbox-indicator"></div>' : ''}
+        <div class="ingredient-image">${option.icon}</div>
+        <div class="ingredient-content">
+          <div class="ingredient-name">
+            ${option.name}
+            <span class="ingredient-price">${option.price > 0 ? `+¥${option.price}` : '免费'}</span>
+          </div>
+          <div class="ingredient-desc">${option.desc}</div>
+          <div class="ingredient-pros">✓ ${option.pros}</div>
+          ${option.cons ? `<div class="ingredient-cons">✗ ${option.cons}</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+  updateNextButton();
+}
+
+// 页面切换事件监听
+function setupPageListeners() {
+  // 监听页面切换
+  document.querySelectorAll('.page').forEach(page => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.target.classList.contains('active')) {
+          const pageId = mutation.target.id;
+          if (pageId === 'home') {
+            renderSpecPage();
+          } else if (pageId === 'ingredient' && currentCategory) {
+            renderIngredientPage(currentCategory);
+          } else if (pageId === 'summary') {
+            updateSummary();
+          } else if (pageId === 'order') {
+            updateOrderSummary();
+          }
+        }
+      });
+    });
+    observer.observe(page, { attributes: true, attributeFilter: ['class'] });
+  });
+}
+
+// 更新订单总结页
+function updateOrderSummary() {
+  const summaryBody = document.getElementById('orderSummary');
+  const totalPriceEl = document.getElementById('orderTotalPrice');
+
+  if (!summaryBody || !totalPriceEl) return;
+
+  let html = '';
+
+  // 规格信息
+  if (selectedSpec) {
+    html += `
+      <div class="summary-row">
+        <span class="summary-label">规格</span>
+        <span class="summary-value">${selectedSpec.name} (${selectedSpec.capacity})</span>
+        <span class="summary-price">¥${selectedSpec.price}</span>
+      </div>
+    `;
+  }
+
+  // 成分信息
+  categoryOrder.forEach(category => {
+    const selection = selections[category];
+    if (selection) {
+      if (Array.isArray(selection)) {
+        // 多选模式：显示所有选中项
+        if (selection.length > 0) {
+          html += `
+            <div class="summary-row">
+              <span class="summary-label">${categoryData[category].title}</span>
+              <span class="summary-value">
+                ${selection.map(item => item.name).join(' + ')}
+              </span>
+              <span class="summary-price">+¥${selection.reduce((sum, item) => sum + item.price, 0)}</span>
+            </div>
+          `;
+        }
+      } else {
+        // 单选模式
+        html += `
+          <div class="summary-row">
+            <span class="summary-label">${categoryData[category].title}</span>
+            <span class="summary-value">${selection.name}</span>
+            <span class="summary-price">${selection.price > 0 ? `+¥${selection.price}` : '-'}</span>
+          </div>
+        `;
+      }
+    }
+  });
+
+  summaryBody.innerHTML = html;
+
+  // 更新总价
+  const totalPrice = calculateTotal();
+  totalPriceEl.textContent = `¥${totalPrice}`;
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+  setupPageListeners();
+  showPage('home');
+  updateNextButton();
+});
+
+</script>
+</body>
+</html>
